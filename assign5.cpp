@@ -129,55 +129,58 @@ void quickSort(int arr[], int size, SortStats &stats) {
     qsort(0, size - 1, arr, stats);
 }
 
-int merge(int arr[], int left_arr[], int right_arr[], int size, int mid) {
+int merge(int arr[], int start, int end, int mid, SortStats &stats) {
     int i, j, k;
-    i = j = k = 0;
+    i = start;
+    k = 0;
+    j = mid + 1;
 
-    int num_left = mid;
-    int num_right = size - mid;
+    int temp[end+1];
 
-    while (i < num_left && j < num_right) {
-        if (left_arr[i] < right_arr[j]) {
-            arr[k] = left_arr[i];
+    while (i <= mid && j <= end) {
+        if (arr[i] < arr[j]) {
+            temp[k] = arr[i];
             i++;
         }
         else {
-            arr[k] = right_arr[j];
+            temp[k] = arr[j];
             j++;
         }
         k++;
     }
 
-    while (i < num_left) {
-        arr[k] = left_arr[i];
+    while (i <= mid) {
+        temp[k] = arr[i];
         i++;
         k++;
     }
 
-    while (j < num_right) {
-        arr[k] = right_arr[j];
+    while (j <= end) {
+        temp[k] = arr[j];
         j++;
         k++;
     }
+//    displayArray(temp, end - start + 1);
+//    displayArray(arr, end - start + 1);
+
+    int final = 0;
+    for (i = start; i < end + 1; i++) {
+        arr[i] = temp[final];
+        final++;
+    }
 }
 
-void msort(int arr[], int size, int start, int end) {
-    if (size < 2) { return; }
-    int mid = size / 2;
-    int left_arr[mid];
-    int right_arr[size - mid];
-    for (int i = 0; i < mid - 1; i++) {
-        left_arr[i] = arr[i];
+void msort(int arr[], int start, int end, SortStats &stats) {
+    if (start < end) {
+        int mid = (start + end) / 2;
+
+        msort(arr, start, mid, stats);
+        msort(arr, mid + 1, end, stats);
+        merge(arr, start, end, mid, stats);
     }
-    for (int i = mid; i < size - 1; i++) {
-        right_arr[i - mid] = arr[i];
-    }
-    msort(arr, size, start, mid);
-    msort(arr, size, mid + 1, end);
-    merge(arr, left_arr, right_arr, size, mid);
 }
 
 void mergeSort(int arr[], int size, SortStats &stats) {
-  msort(arr, size, 0, size - 1);
+  msort(arr, 0, size - 1, stats);
 }
 

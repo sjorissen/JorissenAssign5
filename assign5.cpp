@@ -1,4 +1,4 @@
-/* YOUR NAME HERE
+/* Sarah Jorissen
  * CSCI 3250
  * Assignment 5
  * Implements and tests six different sorting algorithms
@@ -17,67 +17,71 @@ void mergeSort(int arr[], int size, SortStats &stats);
 
 int main()
 {
-  const int SIZE = 20;
+    const int SIZE = 20;
 
-  // Tests each algorithm using four different orderings.
-  // Set the last argument to true to display contents of array before and after sorting
-//  testSort("insertion sort", SIZE, insertionSort, false);
-//  testSort("selection sort", SIZE, selectionSort, false);
-//  testSort("bubble sort", SIZE, bubbleSort, false);
-//  testSort("heapsort", SIZE, heapSort, false);
-  testSort("quicksort", SIZE, quickSort, false);
-  testSort("mergesort", SIZE, mergeSort, false);
+    // Tests each algorithm using four different orderings.
+    // Set the last argument to true to display contents of array before and after sorting
+    testSort("insertion sort", SIZE, insertionSort, false);
+    testSort("selection sort", SIZE, selectionSort, false);
+    testSort("bubble sort", SIZE, bubbleSort, false);
+    testSort("heapsort", SIZE, heapSort, false);
+    testSort("quicksort", SIZE, quickSort, false);
+    testSort("mergesort", SIZE, mergeSort, false);
 
-  return 0;
+    return 0;
 }
 
 void insertionSort(int arr[], int size, SortStats &stats) {
-  for (int i = 1; i < size; i++) {
-    int j;
-    stats.assign(j, i);
-    while(stats.less(arr[j], arr[j-1]) && j != 0) {
-      stats.swap(arr[j],arr[j-1]);
-      j--;
+    // index i keeps track of values already sorted, ends loop when all values are in their right place
+    for (int i = 1; i < size; i++) {
+        int j; // index j goes through array to compare values
+        stats.assign(j, i);
+        // if a value at index j is less than the value prior to it, swap them
+        while(stats.less(arr[j], arr[j-1]) && j != 0) {
+            stats.swap(arr[j],arr[j-1]);
+            j--;
+        }
     }
-  }
 }
 
 void selectionSort(int arr[], int size, SortStats &stats) {
-  for (int i = 0; i < size; i++) {
-    int small;
-    stats.assign(small, i);
-    for (int j = i; j < size; j++) {
-      if(stats.less(arr[j],arr[small])) {
-        stats.assign(small, j);
-      }
+    for (int i = 0; i < size; i++) {
+        int small;
+        stats.assign(small, i);
+        // finds smallest element in the array
+        for (int j = i; j < size; j++) {
+            if(stats.less(arr[j],arr[small])) {
+                stats.assign(small, j);
+            }
+        }
+        // places smallest element at next i iteration
+        stats.swap(arr[i], arr[small]);
     }
-//    if(stats.less(arr[small], arr[i])) {
-      stats.swap(arr[i], arr[small]);
-//    }
-  }
 }
 
 void bubbleSort(int arr[], int size, SortStats &stats) {
-  bool inorder;
-  do {
-    inorder = true;
-    for(int i = 0; i < size - 1; i++) {
-      if (stats.less(arr[i + 1], arr[i])) {
-        stats.swap(arr[i+1], arr[i]);
-        inorder = false;
-      }
-    }
-  } while(!inorder);
+    bool inorder; // checks to see if array is in order
+    do {
+        inorder = true;
+        for(int i = 0; i < size - 1; i++) {
+            // compares value in array with the value beside it, swap if the left value is higher
+            if (stats.less(arr[i + 1], arr[i])) {
+                stats.swap(arr[i+1], arr[i]);
+                // if a swap is made, set inorder to false
+                inorder = false;
+            }
+        }
+    } while(!inorder); // when inorder is set to false
 }
 
 void heapSort(int arr[], int size, SortStats &stats) {
     int heap_arr[size + 1];
     int count; // counter to decrement our last index of arrays
 
-        // Copies array into second "heap array" that starts at index 1
-       for (int i = 1; i < size + 1; i++) {
-            stats.assign(heap_arr[i], arr[i - 1]);
-        }
+    // Copies array into second "heap array" that starts at index 1
+    for (int i = 1; i < size + 1; i++) {
+        stats.assign(heap_arr[i], arr[i - 1]);
+    }
 
     // Loops through and takes largest of heap and assigns it to end of array, then decrements
     // last index of both arrays
@@ -104,19 +108,24 @@ void heapSort(int arr[], int size, SortStats &stats) {
 
 int partition(int start, int end, int arr[], SortStats &stats) {
     int pivot;
-    stats.assign(pivot, arr[end]);
-    int pindex = start;
+    stats.assign(pivot, arr[end]); // chooses value at array end as pivot
+    int pindex = start; // pivot index, to sort by swapping with values <= pivot
     stats.assign(pindex,start);
+
+    // compares each value in array to pivot, and swaps it with pindex if it is less than or equal to pivot value
+    // increments pivot until entire array is complete
     for(int i = start; i < end; i++) {
         if (!(stats.less(pivot, arr[i]))) {
             stats.swap(arr[i],arr[pindex]);
             pindex++;
         }
     }
+    // once array is sorted into lesser & greater than halves, swap pindex with pivot
     stats.swap(arr[pindex], arr[end]);
     return pindex;
 }
 
+// recursively sort each side of array
 void qsort(int start, int end, int arr[], SortStats &stats) {
     if (stats.less(start, end)) {
         int pindex = partition(start, end, arr, stats);
@@ -131,48 +140,55 @@ void quickSort(int arr[], int size, SortStats &stats) {
 
 int merge(int arr[], int start, int end, int mid, SortStats &stats) {
     int i, j, k;
-    i = start;
-    k = 0;
-    j = mid + 1;
+    stats.assign(i, start); // index i for left half of divided array
+    stats.assign(k, 0); // index k for temp array
+    stats.assign(j, mid + 1); // index j for right half of array
 
-    int temp[end+1];
+    int temp[end+1]; // temp array to sort values
 
-    while (i <= mid && j <= end) {
-        if (arr[i] < arr[j]) {
-            temp[k] = arr[i];
+    while (!(stats.less(mid, i)) && !(stats.less(end, j))) {
+        // compare values in left and right arrays
+        if (stats.less(arr[i], arr[j])) {
+            // if left array value is smaller, store in temp array
+            stats.assign(temp[k], arr[i]);
             i++;
         }
         else {
-            temp[k] = arr[j];
+            // if right array value is smaller, store in temp array
+            stats.assign(temp[k], arr[j]);
             j++;
         }
         k++;
     }
 
-    while (i <= mid) {
-        temp[k] = arr[i];
+    // stores any extra values remaining in left array into temp
+    while (!(stats.less(mid, i))) {
+        stats.assign(temp[k], arr[i]);
         i++;
         k++;
     }
 
-    while (j <= end) {
-        temp[k] = arr[j];
+    // stores any extra values remaining in right array into temp
+    while (!(stats.less(end, j))) {
+        stats.assign(temp[k], arr[j]);
         j++;
         k++;
     }
-//    displayArray(temp, end - start + 1);
-//    displayArray(arr, end - start + 1);
 
-    int final = 0;
+    // copies temp into original array
+    int final;
+    stats.assign(final, 0);
     for (i = start; i < end + 1; i++) {
-        arr[i] = temp[final];
+        stats.assign(arr[i], temp[final]);
         final++;
     }
 }
 
+// recursively divides array into smaller arrays, sorts each array then merges them
 void msort(int arr[], int start, int end, SortStats &stats) {
-    if (start < end) {
-        int mid = (start + end) / 2;
+    if (stats.less(start, end)) {
+        int mid;
+        stats.assign(mid, (start + end) / 2);
 
         msort(arr, start, mid, stats);
         msort(arr, mid + 1, end, stats);
@@ -181,6 +197,32 @@ void msort(int arr[], int start, int end, SortStats &stats) {
 }
 
 void mergeSort(int arr[], int size, SortStats &stats) {
-  msort(arr, 0, size - 1, stats);
+    msort(arr, 0, size - 1, stats);
 }
 
+/*
+ *                              ,+*^^*+___+++_
+                       ,*^^^^              )
+                    _+*                     ^**+_
+                  +^       _ _++*+_+++_,         )
+      _+^^*+_    (     ,+*^ ^          \+_        )
+     {       )  (    ,(    ,_+--+--,      ^)      ^\
+    { (@)    } f   ,(  ,+-^ __*_*_  ^^\_   ^\       )
+   {:;-/    (_+*-+^^^^^+*+*<_ _++_)_    )    )      /
+  ( /  (    (        ,___    ^*+_+* )   <    <      \
+   U _/     )    *--<  ) ^\-----++__)   )    )       )
+    (      )  _(^)^^))  )  )\^^^^^))^*+/    /       /
+  (      /  (_))_^)) )  )  ))^^^^^))^^^)__/     +^^
+ (     ,/    (^))^))  )  ) ))^^^^^^^))^^)       _)
+  *+__+*       (_))^)  ) ) ))^^^^^^))^^^^^)____*^
+  \             \_)^)_)) ))^^^^^^^^^^))^^^^)
+   (_             ^\__^^^^^^^^^^^^))^^^^^^^)
+     ^\___            ^\__^^^^^^))^^^^^^^^)\\
+          ^^^^^\uuu/^^\uuu/^^^^\^\^\^\^\^\^\^\
+             ___) >____) >___   ^\_\_\_\_\_\_\)
+            ^^^//\\_^^//\\_^       ^(\_\_\_\)
+              ^^^ ^^ ^^^ ^^
+
+              Happy Turkey Day :)
+ *
+ */

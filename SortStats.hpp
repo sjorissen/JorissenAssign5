@@ -1,4 +1,4 @@
-/* YOUR NAME HERE
+/* Sarah Jorissen
  * CSCI 3250
  * Assignment 5
  * Header file containing code to analyze sorting algorithms
